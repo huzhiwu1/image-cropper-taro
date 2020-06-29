@@ -5,5 +5,83 @@
 	top: 0;
 	left: 0;
 	z-index: 1;
-	background-color: rgba(14, 13, 13, 0.8);
+	background-color: #fff;
+	.bg_container {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		.bg_top {
+			flex: 1;
+			background-color: rgba(0, 0, 0, 0.3);
+		}
+		.bg_middle {
+			display: flex;
+			.bg_middle_left,
+			.bg_middle_right {
+				flex: 1;
+				background-color: rgba(0, 0, 0, 0.3);
+			}
+			.cut_wrapper {
+				position: relative;
+				.border {
+					background-color: rgba(255,255,255,0.4);
+					position: absolute;
+				}
+				.border-top-left {
+					height: 2.5px;
+					top: -2.5px;
+					left: -2.5px;
+					width: 30rpx;
+				}
+				.border-left-top {
+					height: 30rpx;
+					top: -2.5px;
+					left: -2.5px;
+					width: 2.5px;
+				}
+				.border-top-right {
+					top: -2.5px;
+					right: -2.5px;
+					width: 30rpx;
+					height: 2.5px;
+				}
+				.border-right-top {
+					top: -2.5px;
+					right: -2.5px;
+					height: 30rpx;
+					width: 2.5px;
+				}
+				.border-right-bottom {
+					bottom: -2.5px;
+					right: -2.5px;
+					height: 30rpx;
+					width: 2.5px;
+				}
+				.border-bottom-right {
+					width: 30rpx;
+					height: 2.5px;
+					bottom: -2.5px;
+					right: -2.5px;
+				}
+				.border-left-bottom {
+					height: 30rpx;
+					width: 2.5px;
+					bottom: -2.5px;
+					left: -2.5px;
+				}
+				.border-bottom-left {
+					width: 30rpx;
+					height: 2.5px;
+					bottom: -2.5px;
+					left: -2.5px;
+				}
+			}
+		}
+		.bg_bottom {
+			flex: 1;
+			background-color: rgba(0, 0, 0, 0.3);
+		}
+	}
 }
