@@ -26,56 +26,56 @@
 			.cut_wrapper {
 				position: relative;
 				.border {
-					background-color: rgba(255,255,255,0.4);
+					background-color: rgba(255, 255, 255, 0.4);
 					position: absolute;
 				}
 				.border-top-left {
-					height: 2.5px;
-					top: -2.5px;
-					left: -2.5px;
+					height: 4px;
+					top: -4px;
+					left: -4px;
 					width: 30rpx;
 				}
 				.border-left-top {
 					height: 30rpx;
-					top: -2.5px;
-					left: -2.5px;
-					width: 2.5px;
+					top: -4px;
+					left: -4px;
+					width: 4px;
 				}
 				.border-top-right {
-					top: -2.5px;
-					right: -2.5px;
+					top: -4px;
+					right: -4px;
 					width: 30rpx;
-					height: 2.5px;
+					height: 4px;
 				}
 				.border-right-top {
-					top: -2.5px;
-					right: -2.5px;
+					top: -4px;
+					right: -4px;
 					height: 30rpx;
-					width: 2.5px;
+					width: 4px;
 				}
 				.border-right-bottom {
-					bottom: -2.5px;
-					right: -2.5px;
+					bottom: -4px;
+					right: -4px;
 					height: 30rpx;
-					width: 2.5px;
+					width: 4px;
 				}
 				.border-bottom-right {
 					width: 30rpx;
-					height: 2.5px;
-					bottom: -2.5px;
-					right: -2.5px;
+					height: 4px;
+					bottom: -4px;
+					right: -4px;
 				}
 				.border-left-bottom {
 					height: 30rpx;
-					width: 2.5px;
-					bottom: -2.5px;
-					left: -2.5px;
+					width: 4px;
+					bottom: -4px;
+					left: -4px;
 				}
 				.border-bottom-left {
 					width: 30rpx;
-					height: 2.5px;
-					bottom: -2.5px;
-					left: -2.5px;
+					height: 4px;
+					bottom: -4px;
+					left: -4px;
 				}
 			}
 		}
@@ -83,5 +83,10 @@
 			flex: 1;
 			background-color: rgba(0, 0, 0, 0.3);
 		}
+	}
+	.img {
+		position: absolute;
+		z-index: -1;
+		backface-visibility: hidden;
 	}
 }
