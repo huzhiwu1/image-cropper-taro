@@ -1,11 +1,35 @@
 import Taro, { Component } from "@tarojs/taro";
 import { View, Canvas } from "@tarojs/components";
 import "./index.scss";
+function throttle(fn, threshold = 1000 / 40, context = null) {
+	let _lastExecTime = null;
+	return function(...args) {
+		let _nowTime = new Date().getTime();
+		if (_nowTime - Number(_lastExecTime) > threshold || !_lastExecTime) {
+			fn.apply(context, args);
+			_lastExecTime = _nowTime;
+		}
+	};
+}
 export default class ImageCropper extends Component {
 	static defaultProps = {
 		imgSrc: "", //图片路径
 		cut_ratio: 0.5, //裁剪框的 宽/高 比
 	};
+	//触摸事件的相对位置
+	_img_touch_relative = [
+		{
+			x: 0,
+			y: 0,
+		},
+		{
+			x: 0,
+			y: 0,
+		},
+	];
+
+	// 斜边长
+	_hypotenuse_length = 0;
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -24,7 +48,19 @@ export default class ImageCropper extends Component {
 			_cut_height: 200, //裁剪框的高度
 			_cut_left: 0, //裁剪框相对可使用窗口的左边距
 			_cut_top: 0, //裁剪框相对可使用窗口的上边距
+			scale: 1, //默认图片的放大倍数
+			max_scale: 2,
+			min_scale: 0.5,
 		};
+		const { platform } = Taro.getSystemInfoSync();
+		// 安卓节流
+		if (platform === "android") {
+			this._img_touch_move = throttle(
+				this._img_touch_move,
+				1000 / 40,
+				this
+			);
+		}
 	}
 	async componentWillMount() {
 		this.initCanvas();
@@ -67,7 +103,7 @@ export default class ImageCropper extends Component {
 		return new Promise((resolve) => {
 			this.setState(
 				{
-					imgSrc,
+					imgSrc: path,
 					_img_height: height,
 					_img_width: width,
 					_img_ratio: width / height,
@@ -178,8 +214,80 @@ export default class ImageCropper extends Component {
 	 *  图片的点击，移动，移动结束事件
 	 */
 	_img_touch_start(e) {
-		console.log(e, "e");
+		this._touch_end_flag = false; //开始触摸
+		if (e.touches.length === 1) {
+			// 单指触摸
+			// 记录下开始时的触摸点的位置
+			this._img_touch_relative[0] = {
+				//减去图片相对视口的位置
+				x: e.touches[0].clientX - this.state._img_left,
+				y: e.touches[0].clientY - this.state._img_top,
+			};
+		} else {
+			//双指放大
+			let width = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
+			let height = Math.abs(e.touches[0].clientY - e.touches[1].clientY);
+
+			this._hypotenuse_length = Math.sqrt(
+				Math.pow(width, 2) + Math.pow(height, 2)
+			);
+		}
+		console.log("开始", this._img_touch_relative);
 	}
+
+	_img_touch_move(e) {
+		//如果结束触摸，则不再移动
+		if (this._touch_end_flag) {
+			console.log("结束false");
+			return;
+		}
+
+		if (e.touches.length === 1) {
+			// 单指拖动
+			let left = e.touches[0].clientX - this._img_touch_relative[0].x;
+			let top = e.touches[0].clientY - this._img_touch_relative[0].y;
+			setTimeout(() => {
+				this.setState({
+					_img_left: left,
+					_img_top: top,
+				});
+			}, 0);
+		} else {
+			//双指放大
+			let width = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
+			let height = Math.abs(e.touches[0].clientY - e.touches[1].clientY);
+			console.log(width, "width");
+
+			let new_hypotenuse_length = Math.sqrt(
+				Math.pow(width, 2) + Math.pow(height, 2)
+			);
+			let newScale =
+				this.state.scale *
+				(new_hypotenuse_length / this._hypotenuse_length);
+			newScale =
+				newScale > this.state.max_scale ||
+				newScale < this.state.min_scale
+					? this.state.scale
+					: newScale;
+			this._hypotenuse_length = new_hypotenuse_length;
+			setTimeout(() => {
+				this.setState(
+					{
+						scale: newScale,
+					},
+					() => {
+						console.log(this.state.scale, "scale");
+					}
+				);
+			}, 0);
+		}
+		// console.log("移动", this._img_touch_relative);
+	}
+
+	_img_touch_end() {
+		this._touch_end_flag = true;
+	}
+
 	render() {
 		const {
 			_cut_width,
@@ -189,6 +297,7 @@ export default class ImageCropper extends Component {
 			_img_width,
 			_img_left,
 			_img_top,
+			scale,
 			_window_height,
 			_window_width,
 		} = this.state;
@@ -226,6 +335,7 @@ export default class ImageCropper extends Component {
 						height: _img_height + "px",
 						top: _img_top + "px",
 						left: _img_left + "px",
+						transform: `scale(${scale})`,
 					}}
 					onTouchStart={this._img_touch_start}
 					onTouchMove={this._img_touch_move}
