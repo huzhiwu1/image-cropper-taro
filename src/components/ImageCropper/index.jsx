@@ -44,6 +44,8 @@ export default class ImageCropper extends Component {
 			_window_width: 0, //可使用窗口宽度
 			_canvas_width: 0, //canvas的宽度
 			_canvas_height: 0, //canvas的高度
+			_canvas_left: 0, //canvas相对可视窗口的左边距
+			_canvas_top: 0, //canvas相对可视窗口的上边距
 			_cut_width: 200, //裁剪框的宽度
 			_cut_height: 200, //裁剪框的高度
 			_cut_left: 0, //裁剪框相对可使用窗口的左边距
@@ -76,7 +78,7 @@ export default class ImageCropper extends Component {
 	 *  获取canvas上下文
 	 */
 	initCanvas() {
-		this.ctx = Taro.createCanvasContext("canvas", this);
+		this.ctx = Taro.createCanvasContext("my-canvas", this.$scope);
 	}
 	/**
 	 * 获取设备屏幕的宽高
@@ -389,6 +391,104 @@ export default class ImageCropper extends Component {
 	_img_touch_end() {
 		this._touch_end_flag = true;
 	}
+	/**
+	 * 保存图片到本地
+	 */
+	_getImg() {
+		const { _cut_height, _cut_width, cut_ratio } = this.state;
+		return new Promise((resolve, reject) => {
+			this._draw(() => {
+				Taro.canvasToTempFilePath(
+					{
+						width: _cut_width,
+						height: _cut_height,
+						destWidth: 400,
+						destHeight: 400 / cut_ratio,
+						canvasId: "my-canvas",
+						fileType: "png",
+						success(res) {
+							console.log(res, "成功");
+							resolve(res);
+						},
+						fail(err) {
+							console.log(err, "err");
+							reject(err);
+						},
+					},
+					this.$scope //不这样写会报错
+				);
+			});
+		});
+	}
+	/**
+	 * 绘制图片
+	 */
+	_draw(callback) {
+		const {
+			_cut_height,
+			_cut_width,
+			_cut_left,
+			_cut_top,
+			angle,
+			scale,
+			_img_width,
+			_img_height,
+			_img_left,
+			_img_top,
+			imgSrc,
+		} = this.state;
+
+		this.setState(
+			{
+				_canvas_height: _cut_height,
+				_canvas_width: _cut_width,
+				_canvas_left: _cut_left,
+				_canvas_top: _cut_top,
+			},
+			() => {
+				// 用户移动旋转放大后的图像大小thu
+				let img_width = _img_width * scale;
+				let img_height = _img_height * scale;
+				// 图片和裁剪框的相对距离
+				let distX = _img_left - _cut_left;
+				let distY = _img_top - _cut_top;
+				console.log(this.ctx, "ctx前");
+
+				// 根据图像的旋转角度，旋转画布的坐标轴,
+				this.ctx.translate(
+					distX + img_width / 2,
+					distY + img_height / 2
+				);
+				this.ctx.rotate((angle * Math.PI) / 180);
+				this.ctx.translate(
+					-distX - img_width / 2,
+					-distY - img_height / 2
+				);
+				console.log(this.ctx, "ctx");
+				//根据相对距离移动画布的原点
+				this.ctx.translate(distX, distY);
+
+				// 绘制图像
+
+				this.ctx.drawImage(imgSrc, 0, 0, img_width, img_height);
+				this.ctx.draw(false, () => {
+					console.log("云心");
+					// console.log(this, ",,", this.ctx);
+					// this.ctx.toTempFilePath({
+					// 	width: _cut_width,
+					// 	height: _cut_height,
+					// 	destWidth: 400,
+					// 	destHeight: 400 / cut_ratio,
+					// 	canvasId: "my-canvas",
+					// 	fileType: "png",
+					// 	success: (res) => console.log(res, "成功"),
+					// 	fail: (err) => console.log(err, "失败"),
+					// });
+					callback && callback();
+				});
+			}
+		);
+	}
 
 	render() {
 		const {
@@ -401,8 +501,10 @@ export default class ImageCropper extends Component {
 			_img_top,
 			scale,
 			angle,
-			_window_height,
-			_window_width,
+			_canvas_height,
+			_canvas_width,
+			_canvas_left,
+			_canvas_top,
 		} = this.state;
 		return (
 			<View className="image-cropper-wrapper">
@@ -434,18 +536,28 @@ export default class ImageCropper extends Component {
 					className="img"
 					src={imgSrc}
 					style={{
-						width: _img_width + "px",
-						height: _img_height + "px",
+						width: _img_width * scale + "px",
+						height: _img_height * scale + "px",
 						top: _img_top + "px",
 						left: _img_left + "px",
 						// translate3d(${_img_left}px,${_img_top}px,0)
-						transform: `scale(${scale}) rotate(${angle}deg) `,
+						transform: `rotate(${angle}deg) `,
 					}}
 					onTouchStart={this._img_touch_start}
 					onTouchMove={this._img_touch_move}
 					onTouchEnd={this._img_touch_end}
 				/>
-				<Canvas canvasId="canvas" disableScroll={false}></Canvas>
+				<Canvas
+					canvasId="my-canvas"
+					className="my-canvas-class"
+					disableScroll={false}
+					style={{
+						width: _canvas_width + "px",
+						height: _canvas_height + "px",
+						left: _canvas_left + "px",
+						top: _canvas_top + "px",
+					}}
+				></Canvas>
 			</View>
 		);
 	}
