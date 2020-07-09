@@ -236,12 +236,24 @@ export default class ImageCropper extends Component {
 			//双指旋转
 			this._img_touch_relative = [
 				{
-					x: e.touches[0].clientX - this.state._img_left,
-					y: e.touches[0].clientY - this.state._img_top,
+					x:
+						e.touches[0].clientX -
+						this.state._img_left -
+						this.state._img_width / 2,
+					y:
+						e.touches[0].clientY -
+						this.state._img_top -
+						this.state._img_height / 2,
 				},
 				{
-					x: e.touches[1].clientX - this.state._img_left,
-					y: e.touches[1].clientY - this.state._img_top,
+					x:
+						e.touches[1].clientX -
+						this.state._img_left -
+						this.state._img_width / 2,
+					y:
+						e.touches[1].clientY -
+						this.state._img_top -
+						this.state._img_height / 2,
 				},
 			];
 		}
@@ -286,57 +298,74 @@ export default class ImageCropper extends Component {
 			// 双指旋转
 			let _new_img_touch_relative = [
 				{
-					x: e.touches[0].clientX - this.state._img_left,
-					y: e.touches[0].clientY - this.state._img_top,
+					x:
+						e.touches[0].clientX -
+						this.state._img_left -
+						this.state._img_width / 2,
+					y:
+						e.touches[0].clientY -
+						this.state._img_top -
+						this.state._img_height / 2,
 				},
 				{
-					x: e.touches[1].clientX - this.state._img_left,
-					y: e.touches[1].clientY - this.state._img_top,
+					x:
+						e.touches[1].clientX -
+						this.state._img_left -
+						this.state._img_width / 2,
+					y:
+						e.touches[1].clientY -
+						this.state._img_top -
+						this.state._img_height / 2,
 				},
 			];
 			// console.log(e.touches[1], "e.touches[1");
 			// 第一根手指的旋转角度
-			// let first_atan_old =
-			// 	(180 / Math.PI) *
-			// 	Math.atan2(
-			// 		this._img_touch_relative[0].y,
-			// 		this._img_touch_relative[0].x
-			// 	);
-			// let first_atan =
-			// 	(180 / Math.PI) *
-			// 	Math.atan2(
-			// 		_new_img_touch_relative[0].y,
-			// 		_new_img_touch_relative[0].x
-			// 	);
-			let first_dist_y =
-				_new_img_touch_relative[0].y - this._img_touch_relative[0].y;
-			let first_dist_x =
-				_new_img_touch_relative[0].x - this._img_touch_relative[0].x;
-			let first_deg = Math.atan2(first_dist_y, first_dist_x);
-
+			let first_atan_old =
+				(180 / Math.PI) *
+				Math.atan2(
+					this._img_touch_relative[0].y,
+					this._img_touch_relative[0].x
+				);
+			let first_atan =
+				(180 / Math.PI) *
+				Math.atan2(
+					_new_img_touch_relative[0].y,
+					_new_img_touch_relative[0].x
+				);
+			// console.log(
+			// 	_new_img_touch_relative[0].y,
+			// 	this._img_touch_relative[0].y,
+			// 	"_new_img_touch_relative[0].y - this._img_touch_relative[0].y;"
+			// );
+			// let first_dist_y =
+			// 	_new_img_touch_relative[0].y - this._img_touch_relative[0].y;
+			// let first_dist_x =
+			// 	_new_img_touch_relative[0].x - this._img_touch_relative[0].x;
+			// let first_deg = Math.atan2(first_dist_y, first_dist_x);
+			let first_deg = first_atan - first_atan_old;
 			// 第二根手指的旋转角度
-			// let second_atan_old =
-			// 	(180 / Math.PI) *
-			// 	Math.atan2(
-			// 		this._img_touch_relative[1].y,
-			// 		this._img_touch_relative[1].x
-			// 	);
+			let second_atan_old =
+				(180 / Math.PI) *
+				Math.atan2(
+					this._img_touch_relative[1].y,
+					this._img_touch_relative[1].x
+				);
 
-			// let second_atan =
-			// 	(180 / Math.PI) *
-			// 	Math.atan2(
-			// 		_new_img_touch_relative[1].y,
-			// 		_new_img_touch_relative[1].x
-			// 	);
-			let second_dist_y =
-				_new_img_touch_relative[1].y - this._img_touch_relative[1].y;
-			let second_dist_x =
-				_new_img_touch_relative[1].x - this._img_touch_relative[1].x;
-			let second_deg = Math.atan2(second_dist_y, second_dist_x);
-
+			let second_atan =
+				(180 / Math.PI) *
+				Math.atan2(
+					_new_img_touch_relative[1].y,
+					_new_img_touch_relative[1].x
+				);
+			// let second_dist_y =
+			// 	_new_img_touch_relative[1].y - this._img_touch_relative[1].y;
+			// let second_dist_x =
+			// 	_new_img_touch_relative[1].x - this._img_touch_relative[1].x;
+			// let second_deg = Math.atan2(second_dist_y, second_dist_x);
+			let second_deg = second_atan - second_atan_old;
 			// 当前的旋转角度
 			let current_deg = 0;
-			if (first_deg != 0) {
+			if (Math.abs(first_deg) > Math.abs(second_deg)) {
 				current_deg = first_deg;
 			} else {
 				current_deg = second_deg;
@@ -350,7 +379,7 @@ export default class ImageCropper extends Component {
 						angle: prevState.angle + current_deg,
 					}),
 					() => {
-						console.log(this.state.angle, "angle");
+						// console.log(this.state.angle, "angle");
 					}
 				);
 			}, 0);
