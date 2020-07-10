@@ -23,7 +23,7 @@
 | img_left   | Number | 图片相对屏幕的左边距 | 否   |
 | img_top    | Number | 图片相对屏幕的上边距 | 否   |
 
-## 如和拿到绘制的图片地址
+## 如何拿到绘制的图片地址
 
 ```react
 class demo extend Component{
@@ -35,7 +35,7 @@ class demo extend Component{
         let result = await this.imageCropper.current._getImg()
         //result==
         //{  errMsg: "canvasToTempFilePath:ok"
-		//tempFilePath: "xxx.png" }
+        // tempFilePath: "xxx.png" }
         // tempFilePath即是地址
     }
     render(){
