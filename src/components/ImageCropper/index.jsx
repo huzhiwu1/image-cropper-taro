@@ -1,5 +1,5 @@
 import Taro, { Component } from "@tarojs/taro";
-import { View, Canvas } from "@tarojs/components";
+import { View, Canvas, Image } from "@tarojs/components";
 import "./index.scss";
 function throttle(fn, threshold = 1000 / 40, context = null) {
 	let _lastExecTime = null;
@@ -44,8 +44,8 @@ export default class ImageCropper extends Component {
 			_window_width: 0, //可使用窗口宽度
 			_canvas_width: 0, //canvas的宽度
 			_canvas_height: 0, //canvas的高度
-			_canvas_left: 0, //canvas相对可视窗口的左边距
-			_canvas_top: 0, //canvas相对可视窗口的上边距
+			_canvas_left: 0, //canvas相对可使用窗口的左边距
+			_canvas_top: 0, //canvas相对可使用窗口的上边距
 			_cut_width: 200, //裁剪框的宽度
 			_cut_height: 200, //裁剪框的高度
 			_cut_left: 0, //裁剪框相对可使用窗口的左边距
@@ -68,9 +68,9 @@ export default class ImageCropper extends Component {
 	async componentWillMount() {
 		this.initCanvas();
 		await this.getDeviceInfo();
-		await this.initImageInfo();
 		await this.computedCutSize();
 		await this.computedCutDistance();
+		await this.initImageInfo();
 		await this.computedImageSize();
 		await this.computedImageDistance();
 	}
@@ -334,16 +334,7 @@ export default class ImageCropper extends Component {
 					_new_img_touch_relative[0].y,
 					_new_img_touch_relative[0].x
 				);
-			// console.log(
-			// 	_new_img_touch_relative[0].y,
-			// 	this._img_touch_relative[0].y,
-			// 	"_new_img_touch_relative[0].y - this._img_touch_relative[0].y;"
-			// );
-			// let first_dist_y =
-			// 	_new_img_touch_relative[0].y - this._img_touch_relative[0].y;
-			// let first_dist_x =
-			// 	_new_img_touch_relative[0].x - this._img_touch_relative[0].x;
-			// let first_deg = Math.atan2(first_dist_y, first_dist_x);
+
 			let first_deg = first_atan - first_atan_old;
 			// 第二根手指的旋转角度
 			let second_atan_old =
@@ -359,11 +350,6 @@ export default class ImageCropper extends Component {
 					_new_img_touch_relative[1].y,
 					_new_img_touch_relative[1].x
 				);
-			// let second_dist_y =
-			// 	_new_img_touch_relative[1].y - this._img_touch_relative[1].y;
-			// let second_dist_x =
-			// 	_new_img_touch_relative[1].x - this._img_touch_relative[1].x;
-			// let second_deg = Math.atan2(second_dist_y, second_dist_x);
 			let second_deg = second_atan - second_atan_old;
 			// 当前的旋转角度
 			let current_deg = 0;
@@ -450,8 +436,10 @@ export default class ImageCropper extends Component {
 				let img_width = _img_width * scale;
 				let img_height = _img_height * scale;
 				// 图片和裁剪框的相对距离
-				let distX = _img_left - _cut_left;
-				let distY = _img_top - _cut_top;
+				let distX =
+					_img_left - (_img_width * (scale - 1)) / 2 - _cut_left;
+				let distY =
+					_img_top - (_img_height * (scale - 1)) / 2 - _cut_top;
 				console.log(this.ctx, "ctx前");
 
 				// 根据图像的旋转角度，旋转画布的坐标轴,
@@ -473,17 +461,7 @@ export default class ImageCropper extends Component {
 				this.ctx.drawImage(imgSrc, 0, 0, img_width, img_height);
 				this.ctx.draw(false, () => {
 					console.log("云心");
-					// console.log(this, ",,", this.ctx);
-					// this.ctx.toTempFilePath({
-					// 	width: _cut_width,
-					// 	height: _cut_height,
-					// 	destWidth: 400,
-					// 	destHeight: 400 / cut_ratio,
-					// 	canvasId: "my-canvas",
-					// 	fileType: "png",
-					// 	success: (res) => console.log(res, "成功"),
-					// 	fail: (err) => console.log(err, "失败"),
-					// });
+
 					callback && callback();
 				});
 			}
@@ -538,8 +516,8 @@ export default class ImageCropper extends Component {
 					style={{
 						width: _img_width * scale + "px",
 						height: _img_height * scale + "px",
-						top: _img_top + "px",
-						left: _img_left + "px",
+						top: _img_top - (_img_height * (scale - 1)) / 2 + "px",
+						left: _img_left - (_img_width * (scale - 1)) / 2 + "px",
 						// translate3d(${_img_left}px,${_img_top}px,0)
 						transform: `rotate(${angle}deg) `,
 					}}

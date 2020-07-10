@@ -92,6 +92,7 @@
 		transform-origin: center center;
 	}
 	.my-canvas-class {
-		// position: absolute;
+		position: absolute;
+		z-index: -2;
 	}
 }

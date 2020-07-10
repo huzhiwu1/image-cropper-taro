@@ -1,5 +1,5 @@
 import Taro, { Component } from "@tarojs/taro";
-import { View, Text } from "@tarojs/components";
+import { View, Text, Button } from "@tarojs/components";
 import "./index.scss";
 import ImageCropper from "../../components/ImageCropper";
 
@@ -49,6 +49,7 @@ export default class Index extends Component {
 				<Button onClick={this.handleOk} className="confirm-btn">
 					确定
 				</Button>
+				{/*
 				<Button onClick={this.handleOutPut} className="confirm-btn a">
 					输出
 				</Button>
@@ -57,7 +58,7 @@ export default class Index extends Component {
 					className="confirm-btn b"
 				>
 					保存图片
-				</Button>
+				</Button> */}
 			</View>
 		);
 	}
