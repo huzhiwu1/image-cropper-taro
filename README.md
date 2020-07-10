@@ -25,7 +25,7 @@
 
 ## 如何拿到绘制的图片地址
 
-```
+```js
 class demo extend Component{
     constructor(props){
         super(props)
