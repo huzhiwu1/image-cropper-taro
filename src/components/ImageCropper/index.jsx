@@ -15,6 +15,11 @@ export default class ImageCropper extends Component {
 	static defaultProps = {
 		imgSrc: "", //图片路径
 		cut_ratio: 0.5, //裁剪框的 宽/高 比
+		destWidth: null, //要导出的图片的宽度
+		img_height: null, //图片的高度
+		img_width: null, //图片的宽度
+		img_left: null, //图片相对可使用窗口的左边距
+		img_top: null, //图片相对可使用窗口的上边距
 	};
 	//触摸事件的相对位置
 	_img_touch_relative = [
@@ -52,6 +57,7 @@ export default class ImageCropper extends Component {
 			_cut_top: 0, //裁剪框相对可使用窗口的上边距
 			scale: 1, //默认图片的放大倍数
 			angle: 0, //图片旋转角度
+			quality: 1, //图片的质量
 			max_scale: 2,
 			min_scale: 0.5,
 		};
@@ -107,8 +113,8 @@ export default class ImageCropper extends Component {
 			this.setState(
 				{
 					imgSrc: path,
-					_img_height: height,
-					_img_width: width,
+					// _img_height: height,
+					// _img_width: width,
 					_img_ratio: width / height,
 				},
 				resolve
@@ -181,8 +187,8 @@ export default class ImageCropper extends Component {
 		return new Promise((resovle) => {
 			this.setState(
 				{
-					_img_height,
-					_img_width,
+					_img_height: this.props.img_height || _img_height,
+					_img_width: this.props.img_width || _img_width,
 				},
 				resovle
 			);
@@ -205,8 +211,8 @@ export default class ImageCropper extends Component {
 		return new Promise((resolve) => {
 			this.setState(
 				{
-					_img_left,
-					_img_top,
+					_img_left: this.props.img_left || _img_left,
+					_img_top: this.props.img_top || _img_top,
 				},
 				resolve
 			);
@@ -222,7 +228,7 @@ export default class ImageCropper extends Component {
 			// 单指触摸
 			// 记录下开始时的触摸点的位置
 			this._img_touch_relative[0] = {
-				//减去图片相对视口的位置
+				//减去图片相对视口的位置，得到手指相对图片的左上角的位置x,y
 				x: e.touches[0].clientX - this.state._img_left,
 				y: e.touches[0].clientY - this.state._img_top,
 			};
@@ -287,9 +293,11 @@ export default class ImageCropper extends Component {
 			let new_hypotenuse_length = Math.sqrt(
 				Math.pow(width, 2) + Math.pow(height, 2)
 			);
+			//放大的倍数，等于现在的倍数*（现在两点的距离/上次两点间的距离）
 			let newScale =
 				this.state.scale *
 				(new_hypotenuse_length / this._hypotenuse_length);
+			//如果缩放倍数超过max_scale或是min_scale，则不变化，
 			newScale =
 				newScale > this.state.max_scale ||
 				newScale < this.state.min_scale
@@ -378,20 +386,23 @@ export default class ImageCropper extends Component {
 		this._touch_end_flag = true;
 	}
 	/**
-	 * 保存图片到本地
+	 * 导出图片的本地地址
 	 */
 	_getImg() {
-		const { _cut_height, _cut_width, cut_ratio } = this.state;
+		const { _cut_height, _cut_width, cut_ratio, quality } = this.state;
 		return new Promise((resolve, reject) => {
 			this._draw(() => {
 				Taro.canvasToTempFilePath(
 					{
 						width: _cut_width,
 						height: _cut_height,
-						destWidth: 400,
-						destHeight: 400 / cut_ratio,
+						destWidth: this.props.destWidth || _cut_width,
+						destHeight: this.props.destWidth
+							? this.props.destWidth / cut_ratio
+							: _cut_height,
 						canvasId: "my-canvas",
 						fileType: "png",
+						quality: quality,
 						success(res) {
 							console.log(res, "成功");
 							resolve(res);
@@ -443,6 +454,7 @@ export default class ImageCropper extends Component {
 				console.log(this.ctx, "ctx前");
 
 				// 根据图像的旋转角度，旋转画布的坐标轴,
+				//为了旋转中心在图片的中心，需要先移动下画布的坐标轴
 				this.ctx.translate(
 					distX + img_width / 2,
 					distY + img_height / 2

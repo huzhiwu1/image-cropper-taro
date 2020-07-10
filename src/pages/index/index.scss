@@ -1,24 +1,29 @@
 page {
 	width: 100%;
 	height: 100%;
+	background-color: #ccc;
 }
 .index {
 	width: 100%;
 	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 }
 .confirm-btn {
 	position: fixed;
-	bottom: 0px;
-	right: 50%;
+	bottom: 10px;
+	left: 50%;
 	transform: translateX(-50%);
 	z-index: 999;
-	// &.a {
-	// 	right: 10%;
-	// }
+	font-size: 24rpx;
 }
-.a {
-	right: 10%;
-}
-.b {
-	right: 20%;
+.img-wrapper {
+	width: 66.66vw;
+	height: 133.32vw;
+	background-color: #fff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
