@@ -64,6 +64,10 @@ export default class Index extends Component {
 			// 		});
 			// 	},
 			// });
+		} else {
+			Taro.showToast({
+				title: "请在右上角授权",
+			});
 		}
 	}
 	handleSelectImg() {
