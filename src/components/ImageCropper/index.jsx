@@ -360,9 +360,14 @@ export default class ImageCropper extends Component {
 			let second_deg = second_atan - second_atan_old;
 			// 当前的旋转角度
 			let current_deg = 0;
-			if (Math.abs(first_deg) > Math.abs(second_deg)) {
+			// if (Math.abs(first_deg) > Math.abs(second_deg)) {
+			// 	current_deg = first_deg;
+			// } else {
+			// 	current_deg = second_deg;
+			// }
+			if (first_deg != 0 && first_deg != 360) {
 				current_deg = first_deg;
-			} else {
+			} else if (second_deg != 0 && second_deg != 360) {
 				current_deg = second_deg;
 			}
 			// console.log(this._img_touch_relative[1], "img_touch_relative");
