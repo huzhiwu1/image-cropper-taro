@@ -39,7 +39,7 @@ export default class ImageCropper extends Component {
 		super(props);
 		this.state = {
 			imgSrc: props.imgSrc,
-			cut_ratio: props.cut_ratio, //裁剪框的 宽/高 比
+			cut_ratio: Number(props.cut_ratio), //裁剪框的 宽/高 比
 			_img_height: 0, //图片的高度
 			_img_width: 0, //图片的宽度
 			_img_ratio: 1, //图片的 宽/高 比
@@ -55,21 +55,17 @@ export default class ImageCropper extends Component {
 			_cut_height: 200, //裁剪框的高度
 			_cut_left: 0, //裁剪框相对可使用窗口的左边距
 			_cut_top: 0, //裁剪框相对可使用窗口的上边距
-			scale: 1, //默认图片的放大倍数
-			angle: 0, //图片旋转角度
+			scale: Number(props.scale) || 1, //默认图片的放大倍数
+			angle: Number(props.angle) || 0, //图片旋转角度
 			quality: 1, //图片的质量
 			max_scale: 2,
 			min_scale: 0.5,
 		};
-		const { platform } = Taro.getSystemInfoSync();
-		// 安卓节流
-		if (platform === "android") {
-			this._img_touch_move = throttle(
-				this._img_touch_move,
-				1000 / 40,
-				this
-			);
-		}
+		// const { platform } = Taro.getSystemInfoSync();
+		// // 安卓节流
+		// if (platform === "android") {
+		this._img_touch_move = throttle(this._img_touch_move, 1000 / 40, this);
+		// }
 	}
 	async componentWillMount() {
 		this.initCanvas();
@@ -187,8 +183,8 @@ export default class ImageCropper extends Component {
 		return new Promise((resovle) => {
 			this.setState(
 				{
-					_img_height: this.props.img_height || _img_height,
-					_img_width: this.props.img_width || _img_width,
+					_img_height: Number(this.props.img_height) || _img_height,
+					_img_width: Number(this.props.img_width) || _img_width,
 				},
 				resovle
 			);
@@ -211,8 +207,8 @@ export default class ImageCropper extends Component {
 		return new Promise((resolve) => {
 			this.setState(
 				{
-					_img_left: this.props.img_left || _img_left,
-					_img_top: this.props.img_top || _img_top,
+					_img_left: Number(this.props.img_left) || _img_left,
+					_img_top: Number(this.props.img_top) || _img_top,
 				},
 				resolve
 			);
