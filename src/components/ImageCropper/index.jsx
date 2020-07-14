@@ -221,6 +221,8 @@ export default class ImageCropper extends Component {
 	_img_touch_start(e) {
 		this._touch_end_flag = false; //开始触摸
 		if (e.touches.length === 1) {
+			// 是否单指触摸
+			this._touch_pointer_one = true;
 			// 单指触摸
 			// 记录下开始时的触摸点的位置
 			this._img_touch_relative[0] = {
@@ -229,6 +231,7 @@ export default class ImageCropper extends Component {
 				y: e.touches[0].clientY - this.state._img_top,
 			};
 		} else {
+			this._touch_pointer_one = false;
 			//双指放大
 			let width = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
 			let height = Math.abs(e.touches[0].clientY - e.touches[1].clientY);
@@ -271,7 +274,7 @@ export default class ImageCropper extends Component {
 			return;
 		}
 
-		if (e.touches.length === 1) {
+		if (e.touches.length === 1 && this._touch_pointer_one) {
 			// 单指拖动
 			let left = e.touches[0].clientX - this._img_touch_relative[0].x;
 			let top = e.touches[0].clientY - this._img_touch_relative[0].y;
@@ -281,7 +284,7 @@ export default class ImageCropper extends Component {
 					_img_top: top,
 				});
 			}, 0);
-		} else {
+		} else if (e.touches.length >= 2 && !this._touch_pointer_one) {
 			//双指放大
 			let width = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
 			let height = Math.abs(e.touches[0].clientY - e.touches[1].clientY);
